@@ -7,23 +7,22 @@
           %i.icon-plus
       %nav
         .nav.pull-right
-          -#- if logged_in?
-          -#  - if current_user.role == 'admin'
-          -#    .btn-group
-          -#      %a.btn.btn-inverse.dropdown-toggle{ data: {toggle: "dropdown"}, href: '#'}
-          -#        Admin
-          -#        %span.caret
-          -#      %ul.dropdown-menu
-          -#        %li= link_to "Benutzer", users_path
-          -#  .btn-group
-          -#    -if can? :show, current_user
-          -#      = link_to user_path(current_user), class: "btn" do
-          -#        %i.icon-user
-          -#    = link_to logout_path, method: "delete", class: "btn" do
-          -#      %i.icon-eject
-          -#
-          -#- else
-          .btn-group
-            = link_to "Help", help_path, class: "btn"
-            = link_to "About", about_path, class: "btn"
-            = link_to "Register", register_path, class: "btn"
+          - if logged_in?
+            -#- if current_user.role == 'admin'
+            -#  .btn-group
+            -#    %a.btn.btn-inverse.dropdown-toggle{ data: {toggle: "dropdown"}, href: '#'}
+            -#      Admin
+            -#      %span.caret
+            -#    %ul.dropdown-menu
+            -#      %li= link_to "Benutzer", users_path
+            .btn-group
+              -#-if can? :show, current_user
+              = link_to user_path(current_user), class: "btn" do
+                %i.icon-user
+              = link_to "Logout",  logout_path, method: "delete", class: "btn"
+
+          - else
+            .btn-group
+              = link_to "Register", register_path, class: "btn"
+              = link_to "Log In", login_path, class: "btn"
+
