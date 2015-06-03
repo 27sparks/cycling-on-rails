@@ -56,7 +56,7 @@ class Activity < ActiveRecord::Base
     node.elements.each do |node|
       parse_track_point node, tmp_track
     end
-    tmp_lap.tracks << tmp_track
+    tmp_lap.track = tmp_track
   end
 
   def parse_track_point node, tmp_track

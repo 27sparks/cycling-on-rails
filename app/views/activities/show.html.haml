@@ -15,7 +15,7 @@
   = @activity.laps.count
   - @activity.laps.each do |lap|
     %i Trackpoint
-    =lap.tracks.first.track_points.count
+    =lap.track.track_points.count
 
 = link_to 'Edit', edit_activity_path(@activity)
 \|
