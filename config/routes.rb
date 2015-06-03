@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :activities
   get 'sessions/new'
 
   get 'register' => 'users#new'
