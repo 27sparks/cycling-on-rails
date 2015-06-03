@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  activity_id: 
+  total_time_seconds: 9.99
+  distance_meters: 9.99
+  maximum_speed: 9.99
+  calories: 1
+  average_heart_rate_bpm: 1
+  maximum_heart_rate_bpm: 1
+  intensity: MyString
+  cadence: 1
+  trigger_method: MyString
+  notes: MyString
+
+two:
+  activity_id: 
+  total_time_seconds: 9.99
+  distance_meters: 9.99
+  maximum_speed: 9.99
+  calories: 1
+  average_heart_rate_bpm: 1
+  maximum_heart_rate_bpm: 1
+  intensity: MyString
+  cadence: 1
+  trigger_method: MyString
+  notes: MyString

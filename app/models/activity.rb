@@ -1,5 +1,6 @@
 class Activity < ActiveRecord::Base
   belongs_to :user
+  has_many :laps
 
   tmp = {}
 
@@ -31,13 +32,25 @@ class Activity < ActiveRecord::Base
   end
 
   def parse_lap node
+    tmp_lap = {}
     node.elements.each do |node|
-      if node.node_name != 'Track'
-        puts node.node_name + ' = ' + node.text.to_s
+      case node.node_name
+        when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
+        when 'DistanceMeters' then tmp_lap[:distance_meters] = node.text
+        when 'Calories' then tmp_lap[:calories] = node.text
+        when 'AverageHeartRateBpm' then tmp_lap[:average_heart_rate_bpm] = node.text
+        when 'MaximumHeartRateBpm' then tmp_lap[:maximum_heart_rate_bpm] = node.text
+        when 'Intensity' then tmp_lap[:intensity] = node.text
+        when 'TriggerMethod' then tmp_lap[:trigger_method] = node.text
+        when 'Track' then parse_track node
       end
     end
+    self.laps.build(tmp_lap)
   end
 
+  def parse_track node
+
+  end
   def parse_author node
     #puts "AUTHOR"
     #puts node

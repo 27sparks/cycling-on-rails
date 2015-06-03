@@ -5,10 +5,6 @@
       %ul
         - @activity.errors.full_messages.each do |msg|
           %li= msg
-
-  .field
-    = f.label :user
-    = f.text_field :user
   .field
     = f.label :tcx
     = f.file_field :tcx

@@ -2,13 +2,17 @@
 
 %p
   %b User:
-  = @activity.user
+  = @activity.user.name
 %p
   %b Sport:
   = @activity.sport
 %p
   %b Activity Id:
   = @activity.activity_id
+
+%p
+  %b Laps:
+  = @activity.laps.count
 
 = link_to 'Edit', edit_activity_path(@activity)
 \|
