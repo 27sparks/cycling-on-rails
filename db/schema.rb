@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150603134655) do
+ActiveRecord::Schema.define(version: 20150603140756) do
 
   create_table "activities", force: :cascade do |t|
     t.integer  "user_id"
@@ -41,6 +41,19 @@ ActiveRecord::Schema.define(version: 20150603134655) do
   end
 
   add_index "laps", ["activity_id"], name: "index_laps_on_activity_id"
+
+  create_table "track_points", force: :cascade do |t|
+    t.integer  "track_id"
+    t.datetime "time"
+    t.decimal  "altitude_meters"
+    t.decimal  "distance_meters"
+    t.integer  "heart_rate_bpm"
+    t.string   "sensor_state"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
+
+  add_index "track_points", ["track_id"], name: "index_track_points_on_track_id"
 
   create_table "tracks", force: :cascade do |t|
     t.integer  "lap_id"

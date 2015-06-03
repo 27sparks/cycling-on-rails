@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  track_id: 
+  time: 2015-06-03 16:07:56
+  altitude_meters: 9.99
+  distance_meters: 9.99
+  heart_rate_bpm: 1
+  sensor_state: MyString
+
+two:
+  track_id: 
+  time: 2015-06-03 16:07:56
+  altitude_meters: 9.99
+  distance_meters: 9.99
+  heart_rate_bpm: 1
+  sensor_state: MyString

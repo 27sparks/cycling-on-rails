@@ -45,12 +45,32 @@ class Activity < ActiveRecord::Base
         when 'Track' then parse_track node, tmp_lap
       end
     end
+    # TODO Extensions node
     self.laps << tmp_lap
   end
 
+  # TODO parse Training node
+
   def parse_track node, tmp_lap
     tmp_track = Track.new
+    node.elements.each do |node|
+      parse_track_point node, tmp_track
+    end
     tmp_lap.tracks << tmp_track
+  end
+
+  def parse_track_point node, tmp_track
+    tmp_track_point = TrackPoint.new
+    node.elements.each do |node|
+      case node.node_name
+        when 'Time' then tmp_track_point[:time] = node.text
+        when 'AltitudeMeters' then tmp_track_point[:altitude_meters] = node.text
+        when 'DistanceMeters' then tmp_track_point[:distance_meters] = node.text
+        when 'HeartRateBpm' then tmp_track_point[:heart_rate_bpm] = node.text
+        when 'SensorState' then tmp_track_point[:sensor_state] = node.text
+      end
+    end
+    tmp_track.track_points << tmp_track_point
   end
 
   def parse_author node
