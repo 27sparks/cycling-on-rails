@@ -28,6 +28,8 @@ class Activity < ActiveRecord::Base
     node.elements.each do |node|
       self.activity_id = node.text.to_s if node.node_name.eql? 'Id' # Activity.activity_id
       parse_lap node if node.node_name.eql? 'Lap'
+      parse_training node if node.node_name.eql? 'Training'
+      parse_creator node if node.node_name.eql? 'Creator'
     end
   end
 
@@ -43,13 +45,19 @@ class Activity < ActiveRecord::Base
         when 'Intensity' then tmp_lap[:intensity] = node.text
         when 'TriggerMethod' then tmp_lap[:trigger_method] = node.text
         when 'Track' then parse_track node, tmp_lap
+        when 'Extension' then parse_extension node, tmp_lap #Extension holds the avg_speed for a lap
       end
     end
-    # TODO Extensions node
     self.laps << tmp_lap
   end
 
-  # TODO parse Training node
+  def parse_training node
+
+  end
+
+  def parse_creator node
+
+  end
 
   def parse_track node, tmp_lap
     tmp_track = Track.new
@@ -57,6 +65,10 @@ class Activity < ActiveRecord::Base
       parse_track_point node, tmp_track
     end
     tmp_lap.track = tmp_track
+  end
+
+  def parse_extension node, tmp_lap
+    tmp_lap[:avg_speed] << node.text
   end
 
   def parse_track_point node, tmp_track

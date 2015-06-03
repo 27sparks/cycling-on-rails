@@ -16,6 +16,7 @@
   - @activity.laps.each do |lap|
     %i Trackpoint
     =lap.track.track_points.count
+    =lap.avg_speed
 
 = link_to 'Edit', edit_activity_path(@activity)
 \|
