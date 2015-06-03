@@ -32,7 +32,7 @@ class Activity < ActiveRecord::Base
   end
 
   def parse_lap node
-    tmp_lap = {}
+    tmp_lap = Lap.new
     node.elements.each do |node|
       case node.node_name
         when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
@@ -42,15 +42,17 @@ class Activity < ActiveRecord::Base
         when 'MaximumHeartRateBpm' then tmp_lap[:maximum_heart_rate_bpm] = node.text
         when 'Intensity' then tmp_lap[:intensity] = node.text
         when 'TriggerMethod' then tmp_lap[:trigger_method] = node.text
-        when 'Track' then parse_track node
+        when 'Track' then parse_track node, tmp_lap
       end
     end
-    self.laps.build(tmp_lap)
+    self.laps << tmp_lap
   end
 
-  def parse_track node
-
+  def parse_track node, tmp_lap
+    tmp_track = Track.new
+    tmp_lap.tracks << tmp_track
   end
+
   def parse_author node
     #puts "AUTHOR"
     #puts node
