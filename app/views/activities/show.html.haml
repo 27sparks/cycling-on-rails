@@ -7,17 +7,23 @@
   %b Sport:
   = @activity.sport
 %p
-  %b Activity Id:
-  = @activity.activity_id
+  %b Average Heart Rate:
+  = @activity.avg_heart_rate
 
 %p
-  %b Laps:
-  = @activity.laps.count
-  - @activity.laps.each do |lap|
-    %i Trackpoint
-    =lap.track.track_points.count
-    =lap.avg_speed
+  %b Total Distance(km):
+  = @activity.distance_total_km
 
+%table
+  %tr
+    %th Start Time
+    %th Avg Heart Rate
+    %th Distance (m)
+  - @activity.laps.each do |lap|
+    %tr
+      %td= lap.start_time
+      %td= lap.average_heart_rate_bpm
+      %td= lap.distance_meters
 = link_to 'Edit', edit_activity_path(@activity)
 \|
 = link_to 'Back', activities_path

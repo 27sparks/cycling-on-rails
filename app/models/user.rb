@@ -16,4 +16,13 @@ class User < ActiveRecord::Base
                                                   BCrypt::Engine.cost
     BCrypt::Password.create(string, cost: cost)
   end
+
+  def distance_total_km
+    distance = 0
+    self.activities.each do |activity|
+      distance += activity.distance_total_km
+    end
+    distance
+  end
+
 end

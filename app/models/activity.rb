@@ -2,7 +2,25 @@ class Activity < ActiveRecord::Base
   belongs_to :user
   has_many :laps
 
-  tmp = {}
+  def avg_heart_rate
+    count = 0
+    heart_rate_add_up = 0
+    self.laps.each do |lap|
+      lap.track.track_points.each do |tp|
+        count = count + 1
+        heart_rate_add_up += tp.heart_rate_bpm
+      end
+    end
+    heart_rate_add_up / count
+  end
+
+  def distance_total_km
+    distance = 0
+    self.laps.each do |lap|
+      distance += lap.distance_meters
+    end
+    distance/1000
+  end
 
   def save_with_all_properties path
     xml = File.read path
@@ -41,12 +59,14 @@ class Activity < ActiveRecord::Base
         when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
         when 'DistanceMeters' then tmp_lap[:distance_meters] = node.text
         when 'Calories' then tmp_lap[:calories] = node.text
+        when 'Cadence' then tmp_lap[:cadence] = node.text
         when 'AverageHeartRateBpm' then tmp_lap[:average_heart_rate_bpm] = node.text
         when 'MaximumHeartRateBpm' then tmp_lap[:maximum_heart_rate_bpm] = node.text
+        when 'MaximumSpeed' then tmp_lap[:maximum_speed] = node.text
         when 'Intensity' then tmp_lap[:intensity] = node.text
         when 'TriggerMethod' then tmp_lap[:trigger_method] = node.text
         when 'Track' then parse_track node, tmp_lap
-        when 'Extension' then parse_extension node, tmp_lap #Extension holds the avg_speed for a lap
+        when 'Extensions' then tmp_lap[:avg_speed] = 10#parse_extension_for_avg_speed node #Extension holds the avg_speed for a lap
       end
     end
     self.laps << tmp_lap
@@ -68,8 +88,9 @@ class Activity < ActiveRecord::Base
     tmp_lap.track = tmp_track
   end
 
-  def parse_extension node, tmp_lap
-    tmp_lap[:avg_speed] << node.text
+  def parse_extension_for_avg_speed node
+    node.elements
+    '10'
   end
 
   def parse_track_point node, tmp_track
