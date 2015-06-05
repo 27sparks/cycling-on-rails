@@ -3,3 +3,25 @@
 %br
 %b Total Distance:
 %span= @user.distance_total_km
+
+%table
+  %thead
+    %tr
+      %th Sport
+      %th Id
+      %th
+      %th
+      %th
+
+  %tbody
+    - @user.activities.each do |activity|
+      %tr
+        %td= activity.sport
+        %td= activity.activity_id
+        %td= link_to 'Show', activity
+        %td= link_to 'Edit', edit_activity_path(activity)
+        %td= link_to 'Destroy', activity, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Activity', new_activity_path
