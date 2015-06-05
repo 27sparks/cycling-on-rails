@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150603145023) do
+ActiveRecord::Schema.define(version: 20150605063136) do
 
   create_table "activities", force: :cascade do |t|
     t.integer  "user_id"
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20150603145023) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
     t.decimal  "avg_speed"
+    t.datetime "start_time"
   end
 
   add_index "laps", ["activity_id"], name: "index_laps_on_activity_id"
