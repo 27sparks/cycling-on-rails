@@ -54,6 +54,8 @@ class Activity < ActiveRecord::Base
   def parse_lap node
     tmp_lap = Lap.new
     tmp_lap[:start_time] = node.attr('StartTime')
+    self.start_time = DateTime.now()
+    self.start_time = (self.start_time < tmp_lap.start_time) ? self.start_time : tmp_lap.start_time
     node.elements.each do |node|
       case node.node_name
         when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
