@@ -17,12 +17,11 @@
             -#      %li= link_to "Benutzer", users_path
             .btn-group
               -#-if can? :show, current_user
-              = link_to user_path(current_user), class: "btn" do
-                %i.icon-user
+              = link_to "Users", users_path, class: "btn"
+              = link_to "Profile", current_user, class: "btn"
               = link_to "Logout",  logout_path, method: "delete", class: "btn"
 
           - else
             .btn-group
               = link_to "Register", register_path, class: "btn"
               = link_to "Log In", login_path, class: "btn"
-
