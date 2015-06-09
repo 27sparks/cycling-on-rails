@@ -32,6 +32,16 @@
     %td
     %td
     %td
+
+%table
+  %tr
+    %th month
+    %th km
+  - (1..12).each do |month|
+    %tr
+      %td= month
+      %td= @user.distance_total_km date.year, month
+
 %b Total Distance:
 %span= @user.distance_total_km
 %b= date.year
