@@ -2,13 +2,20 @@ class Activity < ActiveRecord::Base
   belongs_to :user
   has_many :laps
 
+  scope :this_week, -> { where(:start_time => Time.now.beginning_of_week..Time.now.end_of_week) }
+  scope :this_month, -> { where(:start_time => Time.now.beginning_of_month..Time.now.end_of_month) }
+  scope :this_year, -> { where(:start_time => Time.now.beginning_of_year..Time.now.end_of_year) }
+  scope :by_month, ->(month){ where(:start_time => Date.new(Date.now.year, month, 1).beginning_of_month..Date.new(Date.now.year,month,1).end_of_month) }
+  scope :by_year, ->(year){ where(:start_time => Date.new(year, 1, 1).beginning_of_year..Date.new(year,1,1).end_of_year) }
+  scope :by_year_and_month, ->(year, month){ where(:start_time => Date.new(year, month, 1).beginning_of_month..Date.new(year,month,1).end_of_month) }
+
   def avg_heart_rate
     count = 0
     heart_rate_add_up = 0
     self.laps.each do |lap|
       lap.track.track_points.each do |tp|
         count = count + 1
-        heart_rate_add_up += tp.heart_rate_bpm
+        heart_rate_add_up += tp.heart_rate_bpm unless tp.heart_rate_bpm.nil?
       end
     end
     heart_rate_add_up / count
@@ -54,8 +61,7 @@ class Activity < ActiveRecord::Base
   def parse_lap node
     tmp_lap = Lap.new
     tmp_lap[:start_time] = node.attr('StartTime')
-    self.start_time = DateTime.now()
-    self.start_time = (self.start_time < tmp_lap.start_time) ? self.start_time : tmp_lap.start_time
+    self.start_time ||= tmp_lap.start_time
     node.elements.each do |node|
       case node.node_name
         when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
