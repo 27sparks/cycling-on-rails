@@ -17,9 +17,17 @@ class User < ActiveRecord::Base
     BCrypt::Password.create(string, cost: cost)
   end
 
-  def distance_total_km
+  def distance_total_km year = nil, month = nil
     distance = 0
-    self.activities.each do |activity|
+    activities = case
+                   when (year.present? && month.nil?) then self.activities.by_year(year)
+                   when (year.nil? && month.present?) then self.activities.by_month(month)
+                   when (year.present? && month.present?) then self.activities.by_year_and_month(year, month)
+                   when (year.nil? && month.nil?) then self.activities.all
+                   else []
+
+    end
+    activities.each do |activity|
       distance += activity.distance_total_km
     end
     distance
