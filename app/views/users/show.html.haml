@@ -3,7 +3,6 @@
 
 .row
   .col-xs-8
-    Data
   .col-xs-4
     %h2= @user.name
     %table.table.table-bordered.table-striped
@@ -36,6 +35,9 @@
     %th Activities
     - (1..this_month).each do |month|
       %td= @user.activities_total({ year: this_year, month: month })
+
+
+
 
 %table.table.table-bordered.table-striped
   %thead

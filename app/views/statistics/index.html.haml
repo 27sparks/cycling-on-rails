@@ -1,0 +1,21 @@
+%h1 Listing statistics
+
+%table
+  %thead
+    %tr
+      %th User
+      %th
+      %th
+      %th
+
+  %tbody
+    - @statistics.each do |statistic|
+      %tr
+        %td= statistic.user
+        %td= link_to 'Show', statistic
+        %td= link_to 'Edit', edit_statistic_path(statistic)
+        %td= link_to 'Destroy', statistic, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Statistic', new_statistic_path
