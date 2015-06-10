@@ -1,77 +1,76 @@
-%h1= @user.name
-%span= @user.email
-%br
-- date = Date.today
+- this_month = Date.today.month
+- this_year = Date.today.year
 
-%table
+.row
+  .col-xs-8
+    Data
+  .col-xs-4
+    %h2= @user.name
+    %table.table.table-bordered.table-striped
+      %tr
+        %th
+        %th= this_year
+        %td= this_year - 1
+        %th total
+      %tr
+        %td distance
+        %td= number_with_precision @user.distance_total_km( { year: this_year}), precision: 1
+        %td= number_with_precision @user.distance_total_km( { year: (this_year - 1)}), precision: 1
+        %td= number_with_precision @user.distance_total_km, precision: 1
+      %tr
+        %td excercises
+        %td= @user.activities_total( {year: this_year})
+        %td= @user.activities_total( {year: (this_year - 1)})
+        %td= @user.activities_total
+
+%table.table.table-bordered.table-striped
   %tr
     %th
-    %th this week
-    %th last week
-    %th this month
-    %th last month
-    %th this year
-    %th last year
-    %th total
+    - (1..this_month).each do |month|
+      %th= Date::MONTHNAMES[month]
   %tr
-    %td total distance
-    %td
-    %td
-    %td= @user.distance_total_km date.year, date.month
-    %td= @user.distance_total_km date.year, (date.month - 1)
-    %td= @user.distance_total_km date.year
-    %td= @user.distance_total_km (date.year - 1)
-    %td= @user.distance_total_km
-  %tr
-    %td total excercises
-    %td
-    %td
-    %td
-    %td
-    %td
-    %td
-    %td
-    %td
-
-%table
-  %tr
-    %th month
     %th km
-  - (1..12).each do |month|
-    %tr
-      %td= month
-      %td= @user.distance_total_km date.year, month
+    - (1..this_month).each do |month|
+      %td= number_with_precision( @user.distance_total_km({ year: this_year, month: month }), precision: 1)
+  %tr
+    %th Activities
+    - (1..this_month).each do |month|
+      %td= @user.activities_total({ year: this_year, month: month })
 
-%b Total Distance:
-%span= @user.distance_total_km
-%b= date.year
-%span= @user.distance_total_km date.year
-%b This month
-%span= @user.distance_total_km date.year, date.month
-%b April
-%span= @user.distance_total_km date.year, 4
-
-
-%table
+%table.table.table-bordered.table-striped
   %thead
     %tr
-      %th Sport
       %th Date
-      %th Time
+      %th Sport
+      %td
+        %span.glyphicon.glyphicon-heart-empty
+      %td duration
+      %td distance
+      %td intensity
       %th
       %th
       %th
 
   %tbody
-    - @user.activities.each do |activity|
+    - @user.activities.order(start_time: :desc).each do |activity|
       %tr
+        %td= activity.start_time.localtime.strftime('%-d. %b %Y - %H:%M Uhr')
         %td= activity.sport
-        %td= activity.start_time.to_date
-        %td= activity.start_time
-        %td= link_to 'Show', activity
-        %td= link_to 'Edit', edit_activity_path(activity)
-        %td= link_to 'Destroy', activity, :method => :delete, :data => { :confirm => 'Are you sure?' }
+        %td= "#{activity.avg_heart_rate} bpm"
+        %td= activity.duration_hours
+        %td= "#{number_with_precision activity.distance_total_km, precision: 1} km"
+        %td= activity.intensity
+        %td
+          = link_to activity do
+            %span.glyphicon.glyphicon-eye-open
+        %td
+          = link_to edit_activity_path(activity) do
+            %span.glyphicon.glyphicon-edit
+        %td
+          = link_to activity, :method => :delete, :data => { :confirm => 'Are you sure?' } do
+            %span.glyphicon.glyphicon-trash
+
 
 %br
 
-= link_to 'New Activity', new_activity_path
+.btn.btn-default= link_to 'Upload Activity', new_activity_path

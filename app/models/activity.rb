@@ -21,12 +21,31 @@ class Activity < ActiveRecord::Base
     heart_rate_add_up / count
   end
 
+  def duration_minutes
+    duration_seconds = 0
+    self.laps.each do |lap|
+      duration_seconds += lap.total_time_seconds
+    end
+    duration_seconds / 60
+  end
+
+  def duration_hours
+    "#{(duration_minutes / 60).to_i}:#{(duration_minutes % 60).to_i} h"
+  end
+
   def distance_total_km
     distance = 0
     self.laps.each do |lap|
       distance += lap.distance_meters
     end
     distance/1000
+  end
+
+  def intensity
+    max_heart_rate = 185
+    heart_rate_factor = self.avg_heart_rate.fdiv(max_heart_rate)
+    _intensity = duration_minutes * (heart_rate_factor ** 4)
+    _intensity.to_int
   end
 
   def save_with_all_properties path

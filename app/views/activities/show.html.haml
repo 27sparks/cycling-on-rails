@@ -1,8 +1,6 @@
 %p#notice= notice
 
-%p
-  %b User:
-  = @activity.user.name
+%h1= @activity.user.name
 %p
   %b Sport:
   = @activity.sport
@@ -16,6 +14,14 @@
 %p
   %b Total Distance(km):
   = @activity.distance_total_km
+
+%p
+  %b Duration (minutes):
+  = @activity.duration_minutes
+
+%p
+  %b Intensity
+  = @activity.intensity
 
 %table
   %tr
