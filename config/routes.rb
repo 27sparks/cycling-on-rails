@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :activities
   get 'sessions/new'
-  get 'statistics/:action/(:time_frame/(:date/(:steps)))', :controller => 'statistics', :defaults => { :format => 'json' }
+  get 'statistics/:values/:unit(/:time_frame(/:date(/:steps)))' => 'statistics#index', :defaults => { :format => 'json' }
   get 'register' => 'users#new'
   get 'about' => 'static_pages#about'
   get 'help' => 'static_pages#help'

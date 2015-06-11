@@ -13,11 +13,11 @@
 
 %p
   %b Total Distance(km):
-  = @activity.distance_total_km
+  = @activity.distance_km
 
 %p
   %b Duration (minutes):
-  = @activity.duration_minutes
+  = @activity.duration_min
 
 %p
   %b Intensity
@@ -32,7 +32,7 @@
     %tr
       %td= lap.start_time
       %td= lap.average_heart_rate_bpm
-      %td= lap.distance_meters
+      %td= lap.distance_m
 = link_to 'Edit', edit_activity_path(@activity)
 \|
 = link_to 'Back', activities_path

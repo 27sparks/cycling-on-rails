@@ -48,9 +48,7 @@
         %span.glyphicon.glyphicon-heart-empty
       %td duration
       %td distance
-      %td intensity
-      %th
-      %th
+      %td trimp
       %th
 
   %tbody
@@ -60,16 +58,14 @@
         %td= activity.sport
         %td= "#{activity.avg_heart_rate} bpm"
         %td= activity.duration_hours
-        %td= "#{number_with_precision activity.distance_total_km, precision: 1} km"
-        %td= activity.intensity
+        %td= "#{number_with_precision activity.distance_km, precision: 1} km"
+        %td= number_with_precision activity.trimp, precision: 1
         %td
-          = link_to activity do
+          = link_to activity, class: 'btn' do
             %span.glyphicon.glyphicon-eye-open
-        %td
-          = link_to edit_activity_path(activity) do
+          = link_to edit_activity_path(activity), class: 'btn' do
             %span.glyphicon.glyphicon-edit
-        %td
-          = link_to activity, :method => :delete, :data => { :confirm => 'Are you sure?' } do
+          = link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
             %span.glyphicon.glyphicon-trash
 
 

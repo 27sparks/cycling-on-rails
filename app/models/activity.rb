@@ -21,33 +21,60 @@ class Activity < ActiveRecord::Base
     heart_rate_add_up / count
   end
 
-  def duration_minutes
+  def duration_s
     duration_seconds = 0
     self.laps.each do |lap|
       duration_seconds += lap.total_time_seconds
     end
-    duration_seconds / 60
+    duration_seconds
   end
 
-  def duration_hours
-    "#{(duration_minutes / 60).to_i}:#{(duration_minutes % 60).to_i} h"
+  def duration_min
+    duration_s / 60
   end
 
-  def distance_total_km
+  def duration_h
+    duration_min / 60
+  end
+
+  def duration_hours # returns a string value for views
+    "#{(duration_min / 60).to_i}:#{(duration_min % 60).to_i} h"
+  end
+
+  def distance_m
     distance = 0
     self.laps.each do |lap|
       distance += lap.distance_meters
     end
-    distance/1000
+    distance
+  end
+
+  def distance_km
+    distance_m/1000
+  end
+
+  def distance_mi
+    (distance_m/1000)/1.609344
   end
 
   def intensity
-    max_heart_rate = 185
-    heart_rate_factor = self.avg_heart_rate.fdiv(max_heart_rate)
-    _intensity = duration_minutes * (heart_rate_factor ** 4)
-    _intensity.to_int
+    self.avg_heart_rate.fdiv(self.user.lactate_threshold) / 100 * 90
   end
 
+  def hf_per_rest
+    (self.avg_heart_rate - self.user.min_heart_rate).fdiv(self.user.max_heart_rate - self.user.min_heart_rate)
+  end
+
+  def trimp
+    rpe = 7 #cycling
+    a = 0.64
+    b = 1.92
+    #a, b: Faktoren (für Männer: a = 0.64, b = 1.92 - für Frauen: a = 0.86, b = 1.67)
+    duration_min * (hf_per_rest * a * (Math::E ** (b * hf_per_rest))) * rpe.fdiv(10)
+  end
+
+
+  ### The following is all about parsing/importing the tcx/xml ###
   def save_with_all_properties path
     xml = File.read path
     doc = Nokogiri::XML(xml)
@@ -84,7 +111,7 @@ class Activity < ActiveRecord::Base
     node.elements.each do |node|
       case node.node_name
         when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
-        when 'DistanceMeters' then tmp_lap[:distance_meters] = node.text
+        when 'DistanceMeters' then tmp_lap[:distance_m] = node.text
         when 'Calories' then tmp_lap[:calories] = node.text
         when 'Cadence' then tmp_lap[:cadence] = node.text
         when 'AverageHeartRateBpm' then tmp_lap[:average_heart_rate_bpm] = node.text
@@ -126,7 +153,7 @@ class Activity < ActiveRecord::Base
       case node.node_name
         when 'Time' then tmp_track_point[:time] = node.text
         when 'AltitudeMeters' then tmp_track_point[:altitude_meters] = node.text
-        when 'DistanceMeters' then tmp_track_point[:distance_meters] = node.text
+        when 'DistanceMeters' then tmp_track_point[:distance_m] = node.text
         when 'HeartRateBpm' then tmp_track_point[:heart_rate_bpm] = node.text
         when 'SensorState' then tmp_track_point[:sensor_state] = node.text
         when 'Position' then parse_position node, tmp_track_point

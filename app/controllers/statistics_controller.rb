@@ -1,31 +1,23 @@
 class StatisticsController < ApplicationController
   before_action :set_statistic, only: [:show, :edit, :update, :destroy]
-  def distance
-    if params[:time_frame] == 'year'
-      dt = DateTime.new(params[:date].to_i)
-    end
-    boy = dt.beginning_of_year
-    eoy = dt.end_of_year
-    activities = Activity.where("start_time >= ? and start_time <= ?", boy, eoy)
-    @distances = Array.new()
-    activities.each do |activity|
-      distance = {}
-      distance[:km] = activity.distance_total_km
-      distance[:month] = activity.start_time.month
-      @distances <<  distance
-    end
-    puts @distances
-    case params[:step]
-      when 'by_week'
-        puts "weeeeeek"
-      else #defaults to by_month
-        puts "month"
-    end
-  end
-  # GET /statistics
-  # GET /statistics.json
   def index
-    @statistics = Statistic.all
+    function_call = "#{params[:values]}_#{params[:unit]}".to_sym
+    interval = Statistic.prepare_interval params[:time_frame], params[:date]
+    activities = current_user.activities.where("start_time >= ? and start_time <= ?", interval[:start], interval[:end])
+    @results = Statistic.get_prepared_array_for params[:time_frame], params[:date], params[:steps]
+
+    activities.each do |activity|
+      case
+        when params[:time_frame] == 'year' && params[:steps] == 'by_weeks'
+          @results[activity.start_time.to_date.cweek][:value] += activity.send function_call
+        when params[:time_frame] == 'year' && params[:steps] == 'by_days'
+          @results[activity.start_time.to_date.yday][:value] += activity.send function_call
+        when params[:time_frame] == 'month'
+          @results[activity.start_time.to_date.day][:value] += activity.send function_call
+        else
+          @results[activity.start_time.month][:value] += activity.send function_call
+      end
+    end
   end
 
   # GET /statistics/1
@@ -92,4 +84,5 @@ class StatisticsController < ApplicationController
     def statistic_params
       params.require(:statistic).permit(:user_id)
     end
+
 end

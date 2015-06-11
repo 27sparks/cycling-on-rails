@@ -17,11 +17,23 @@ class User < ActiveRecord::Base
     BCrypt::Password.create(string, cost: cost)
   end
 
+  def max_heart_rate
+    185
+  end
+
+  def min_heart_rate
+    54
+  end
+
+  def lactate_threshold
+    168
+  end
+
   def distance_total_km date_params = {}
     distance = 0
     activities = activities_for_time_span date_params
     activities.each do |activity|
-      distance += activity.distance_total_km
+      distance += activity.distance_km
     end
     distance
   end

@@ -1,4 +1,5 @@
-json.array!(@statistics) do |statistic|
-  json.extract! statistic, :id, :user_id
-  json.url statistic_url(statistic, format: :json)
+json.values params[:values]
+json.array! @results do |result|
+  json.extract!(result, :name, :value)
+  json.unit params[:unit]
 end
