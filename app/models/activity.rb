@@ -18,7 +18,7 @@ class Activity < ActiveRecord::Base
         heart_rate_add_up += tp.heart_rate_bpm unless tp.heart_rate_bpm.nil?
       end
     end
-    heart_rate_add_up / count
+    count != 0 ? heart_rate_add_up / count : 0
   end
 
   def duration_s
@@ -107,11 +107,11 @@ class Activity < ActiveRecord::Base
   def parse_lap node
     tmp_lap = Lap.new
     tmp_lap[:start_time] = node.attr('StartTime')
-    self.start_time ||= tmp_lap.start_time
+    self.start_time ||= node.attr('StartTime')
     node.elements.each do |node|
       case node.node_name
         when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
-        when 'DistanceMeters' then tmp_lap[:distance_m] = node.text
+        when 'DistanceMeters' then tmp_lap[:distance_meters] = node.text
         when 'Calories' then tmp_lap[:calories] = node.text
         when 'Cadence' then tmp_lap[:cadence] = node.text
         when 'AverageHeartRateBpm' then tmp_lap[:average_heart_rate_bpm] = node.text
@@ -153,7 +153,7 @@ class Activity < ActiveRecord::Base
       case node.node_name
         when 'Time' then tmp_track_point[:time] = node.text
         when 'AltitudeMeters' then tmp_track_point[:altitude_meters] = node.text
-        when 'DistanceMeters' then tmp_track_point[:distance_m] = node.text
+        when 'DistanceMeters' then tmp_track_point[:distance_meters] = node.text
         when 'HeartRateBpm' then tmp_track_point[:heart_rate_bpm] = node.text
         when 'SensorState' then tmp_track_point[:sensor_state] = node.text
         when 'Position' then parse_position node, tmp_track_point

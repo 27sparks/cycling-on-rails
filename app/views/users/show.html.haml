@@ -2,7 +2,8 @@
 - this_year = Date.today.year
 
 .row
-  .col-xs-8
+  .col-xs-8.chart-container
+    #dashboard-chart
   .col-xs-4
     %h2= @user.name
     %table.table.table-bordered.table-striped
@@ -54,7 +55,7 @@
   %tbody
     - @user.activities.order(start_time: :desc).each do |activity|
       %tr
-        %td= activity.start_time.localtime.strftime('%-d. %b %Y - %H:%M Uhr')
+        %td= activity.start_time.localtime.strftime('%-d. %b %Y - %H:%M Uhr') if activity.start_time.present?
         %td= activity.sport
         %td= "#{activity.avg_heart_rate} bpm"
         %td= activity.duration_hours
@@ -67,8 +68,3 @@
             %span.glyphicon.glyphicon-edit
           = link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
             %span.glyphicon.glyphicon-trash
-
-
-%br
-
-.btn.btn-default= link_to 'Upload Activity', new_activity_path

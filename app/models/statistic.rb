@@ -23,7 +23,7 @@ class Statistic < ActiveRecord::Base
   end
 
   def self.year_by_months_array
-    Date::MONTHNAMES.map { |name| { value: 0, name: name} }
+    Date::MONTHNAMES[1..12].map { |name| { value: 0, name: name[0..2]} }
   end
 
   def self.year_by_weeks_array date

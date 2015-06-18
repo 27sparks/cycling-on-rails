@@ -1,8 +1,6 @@
 %header.navbar.navbar-top.navbar-blue
   .navbar-inner
     .container
-      = link_to root_path, id: "Home" do
-        %h1 Gogogo
       %nav
         .nav.pull-right
           - if logged_in?
@@ -19,6 +17,8 @@
                 %span.glyphicon.glyphicon-list
               = link_to current_user, class: "btn" do
                 %span.glyphicon.glyphicon-user
+              = link_to new_activity_path, class: "btn" do
+                %span.glyphicon.glyphicon-upload
               = link_to logout_path, method: "delete", class: "btn" do
                 %span.glyphicon.glyphicon-log-out
 

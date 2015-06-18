@@ -15,7 +15,7 @@ class StatisticsController < ApplicationController
         when params[:time_frame] == 'month'
           @results[activity.start_time.to_date.day][:value] += activity.send function_call
         else
-          @results[activity.start_time.month][:value] += activity.send function_call
+          @results[activity.start_time.month - 1][:value] += activity.send function_call
       end
     end
   end
