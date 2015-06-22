@@ -9,7 +9,7 @@ class Activity < ActiveRecord::Base
   scope :by_year, ->(year){ where(:start_time => Date.new(year, 1, 1).beginning_of_year..Date.new(year,1,1).end_of_year) }
   scope :by_year_and_month, ->(year, month){ where(:start_time => Date.new(year, month, 1).beginning_of_month..Date.new(year,month,1).end_of_month) }
 
-  def avg_heart_rate
+  def calculate_avg_heart_rate
     count = 0
     heart_rate_add_up = 0
     self.laps.each do |lap|
@@ -21,40 +21,36 @@ class Activity < ActiveRecord::Base
     count != 0 ? heart_rate_add_up / count : 0
   end
 
+  def avghr_bpm
+    self.avg_heart_rate
+  end
+
   def duration_s
     duration_seconds = 0
     self.laps.each do |lap|
       duration_seconds += lap.total_time_seconds
     end
-    duration_seconds
+    duration_seconds.to_f
   end
 
   def duration_min
-    duration_s / 60
+    (duration_s / 60).to_f
   end
 
   def duration_h
-    duration_min / 60
+    (duration_min / 60).to_f
   end
 
   def duration_hours # returns a string value for views
     "#{(duration_min / 60).to_i}:#{(duration_min % 60).to_i} h"
   end
 
-  def distance_m
-    distance = 0
-    self.laps.each do |lap|
-      distance += lap.distance_meters
-    end
-    distance
-  end
-
   def distance_km
-    distance_m/1000
+    (distance_m/1000).to_f
   end
 
   def distance_mi
-    (distance_m/1000)/1.609344
+    ((distance_m/1000)/1.609344).to_f
   end
 
   def intensity
@@ -65,7 +61,7 @@ class Activity < ActiveRecord::Base
     (self.avg_heart_rate - self.user.min_heart_rate).fdiv(self.user.max_heart_rate - self.user.min_heart_rate)
   end
 
-  def trimp
+  def calculate_trimp
     rpe = 7 #cycling
     a = 0.64
     b = 1.92
@@ -73,6 +69,9 @@ class Activity < ActiveRecord::Base
     duration_min * (hf_per_rest * a * (Math::E ** (b * hf_per_rest))) * rpe.fdiv(10)
   end
 
+  def trimp_imp
+    trimp
+  end
 
   ### The following is all about parsing/importing the tcx/xml ###
   def save_with_all_properties path
@@ -95,6 +94,7 @@ class Activity < ActiveRecord::Base
   end
 
   def parse_activity node
+    self.distance_m = 0
     self.sport = node.attr('Sport') # Activity.sport
     node.elements.each do |node|
       self.activity_id = node.text.to_s if node.node_name.eql? 'Id' # Activity.activity_id
@@ -102,6 +102,8 @@ class Activity < ActiveRecord::Base
       parse_training node if node.node_name.eql? 'Training'
       parse_creator node if node.node_name.eql? 'Creator'
     end
+    self.avg_heart_rate = calculate_avg_heart_rate
+    self.trimp = calculate_trimp
   end
 
   def parse_lap node
@@ -123,6 +125,7 @@ class Activity < ActiveRecord::Base
         when 'Extensions' then tmp_lap[:avg_speed] = 10#parse_extension_for_avg_speed node #Extension holds the avg_speed for a lap
       end
     end
+    self.distance_m += tmp_lap[:distance_meters]
     self.laps << tmp_lap
   end
 

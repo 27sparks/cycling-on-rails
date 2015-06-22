@@ -2,69 +2,33 @@
 - this_year = Date.today.year
 
 .row
-  .col-xs-8.chart-container
+  .col-sm-1
+    .btn-group-vertical
+      .btn.btn-default#tlf TLF
+      .btn.btn-default#add ADD
+      .btn.btn-default WTF
+  .col-sm-10.chart-container
     #dashboard-chart
-  .col-xs-4
-    %h2= @user.name
-    %table.table.table-bordered.table-striped
-      %tr
-        %th
-        %th= this_year
-        %td= this_year - 1
-        %th total
-      %tr
-        %td distance
-        %td= number_with_precision @user.distance_total_km( { year: this_year}), precision: 1
-        %td= number_with_precision @user.distance_total_km( { year: (this_year - 1)}), precision: 1
-        %td= number_with_precision @user.distance_total_km, precision: 1
-      %tr
-        %td excercises
-        %td= @user.activities_total( {year: this_year})
-        %td= @user.activities_total( {year: (this_year - 1)})
-        %td= @user.activities_total
-
-%table.table.table-bordered.table-striped
-  %tr
-    %th
-    - (1..this_month).each do |month|
-      %th= Date::MONTHNAMES[month]
-  %tr
-    %th km
-    - (1..this_month).each do |month|
-      %td= number_with_precision( @user.distance_total_km({ year: this_year, month: month }), precision: 1)
-  %tr
-    %th Activities
-    - (1..this_month).each do |month|
-      %td= @user.activities_total({ year: this_year, month: month })
-
-
-
-
-%table.table.table-bordered.table-striped
-  %thead
-    %tr
-      %th Date
-      %th Sport
-      %td
-        %span.glyphicon.glyphicon-heart-empty
-      %td duration
-      %td distance
-      %td trimp
-      %th
-
-  %tbody
-    - @user.activities.order(start_time: :desc).each do |activity|
-      %tr
-        %td= activity.start_time.localtime.strftime('%-d. %b %Y - %H:%M Uhr') if activity.start_time.present?
-        %td= activity.sport
-        %td= "#{activity.avg_heart_rate} bpm"
-        %td= activity.duration_hours
-        %td= "#{number_with_precision activity.distance_km, precision: 1} km"
-        %td= number_with_precision activity.trimp, precision: 1
-        %td
-          = link_to activity, class: 'btn' do
-            %span.glyphicon.glyphicon-eye-open
-          = link_to edit_activity_path(activity), class: 'btn' do
-            %span.glyphicon.glyphicon-edit
-          = link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
-            %span.glyphicon.glyphicon-trash
+  .col-sm-1
+    .btn-group-vertical
+      .btn.btn-default week
+      .btn.btn-default#month month
+      .btn.btn-default#year year
+#activities
+  %h2
+    = link_to "<", user_path(date: @date.prev_month)
+    = @date.strftime("%B %Y")
+    = link_to ">", user_path(date: @date.next_month)
+  = calendar @date do |date|
+    = date.day
+    - if @activities_by_date[date]
+      %ul
+        - @activities_by_date[date].each do |activity|
+          %li
+            = link_to activity do
+              = "#{activity.sport} #{number_with_precision activity.distance_km, precision: 1} km"
+              = number_with_precision activity.trimp, precision: 1
+            -#= link_to edit_activity_path(activity), class: 'btn' do
+            -#  %span.glyphicon.glyphicon-edit
+            -#= link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
+            -#  %span.glyphicon.glyphicon-trash

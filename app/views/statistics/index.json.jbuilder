@@ -1,3 +1,4 @@
-json.array! @results do |result|
-  json.array!(result, :name, :value)
-end
+json.extract!(@results, :data, :pointStart, :pointInterval, :type)
+json.unit params[:unit]
+json.name params[:values]
+
