@@ -11,16 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150610132830) do
+ActiveRecord::Schema.define(version: 20150619170531) do
 
   create_table "activities", force: :cascade do |t|
     t.integer  "user_id"
     t.string   "tcx"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
     t.string   "sport"
     t.string   "activity_id"
     t.datetime "start_time"
+    t.decimal  "trimp"
+    t.integer  "avg_heart_rate"
+    t.integer  "distance_m"
   end
 
   add_index "activities", ["user_id"], name: "index_activities_on_user_id"
