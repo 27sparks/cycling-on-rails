@@ -15,3 +15,6 @@
 /log/*
 !/log/.keep
 /tmp
+.rakeTasks
+dataSources.ids
+vcs.xml
