@@ -1,6 +1,6 @@
 class Activity < ActiveRecord::Base
   belongs_to :user
-  has_many :laps
+  has_many :laps, :dependent => :destroy
 
   scope :this_week, -> { where(:start_time => Time.now.beginning_of_week..Time.now.end_of_week) }
   scope :this_month, -> { where(:start_time => Time.now.beginning_of_month..Time.now.end_of_month) }
