@@ -1,5 +1,6 @@
 $(document).ready(function() {
     var time_frame = 'year'
+    var date = ($.urlParam('date') == null ? new Date().toJSON().slice(0,10) : $.urlParam('date'))
     var options = {
         chart: {
             renderTo: 'dashboard-chart',
@@ -28,18 +29,16 @@ $(document).ready(function() {
     }
     function show_tlf()
     {
-        time_frame = 'year'
-        var url = "/statistics/fatigue/no_unit/" + time_frame + "/" + $.urlParam('date') + "/by_days";
-        var url2 = "/statistics/load/load/" + time_frame + "/" + $.urlParam('date') + "/by_days";
-        var url3 = "/statistics/trimp/imp/" + time_frame + "/" + $.urlParam('date') + "/by_days";
+        var url = "/statistics/fatigue/no_unit/" + time_frame + "/" + date + "/by_days";
+        var url2 = "/statistics/load/load/" + time_frame + "/" + date + "/by_days";
+        var url3 = "/statistics/trimp/imp/" + time_frame + "/" + date + "/by_days";
         collect_jsons([url, url2, url3]);
     };
 
     function show_add() {
-        time_frame = 'month'
-        var url = "/statistics/distance/km/" + time_frame + "/" + $.urlParam('date') + "/by_days";
-        var url2 = "/statistics/duration/h/" + time_frame + "/" + $.urlParam('date') + "/by_days";
-        var url3 ="/statistics/avghr/bpm/" + time_frame + "/" + $.urlParam('date') + "/by_days";
+        var url = "/statistics/distance/km/" + time_frame + "/" + date + "/by_days";
+        var url2 = "/statistics/duration/h/" + time_frame + "/" + date + "/by_days";
+        var url3 ="/statistics/avghr/bpm/" + time_frame + "/" + date + "/by_days";
         collect_jsons([url, url2, url3])
     };
 

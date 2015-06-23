@@ -14,14 +14,14 @@ class StatisticsController < ApplicationController
           case params[:time_frame]
             when 'month'
               (1..100).each do |i|
-                if @results[:data][activity.start_time.to_date.day + i].nil? == false
-                  @results[:data][activity.start_time.to_date.day + i] += ((activity.trimp / 50 / i) * 30.0).to_f
+                if @results[:data][activity.start_time.to_date.day + i - 1].nil? == false
+                  @results[:data][activity.start_time.to_date.day + i - 1] += ((activity.trimp / 50 / i) * 30.0).to_f
                 end
               end
             else
               (1..100).each do |i|
-                if @results[:data][activity.start_time.to_date.yday + i].nil? == false
-                  @results[:data][activity.start_time.to_date.yday + i] += ((activity.trimp / 50 / i) * 20.0).to_f
+                if @results[:data][activity.start_time.to_date.yday + i- 1].nil? == false
+                  @results[:data][activity.start_time.to_date.yday + i - 1] += ((activity.trimp / 50 / i) * 20.0).to_f
                 end
               end
           end
@@ -74,9 +74,9 @@ class StatisticsController < ApplicationController
     end
     @results[:type] = case params[:unit]
                         when 'no_unit'
-                          'line'
+                          'spline'
                         when 'load'
-                          'area'
+                          'areaspline'
                         else
                           'column'
                       end
