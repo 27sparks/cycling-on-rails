@@ -14,7 +14,7 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'jquery-rails'
 
 gem 'haml-rails'
-gem 'turbolinks'
+#gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
@@ -24,6 +24,12 @@ gem 'bcrypt', '~> 3.1.7'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+gem 'puma'
+
+group :production do
+  gem 'pg'
+  gem 'rails_12factor'
+end
 
 group :development, :test do
   gem 'byebug'

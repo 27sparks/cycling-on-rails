@@ -1,7 +1,10 @@
 class UsersController < ApplicationController
+  include CalendarHelper
   def show
     @user = User.find(params[:id])
     @activities = @user.activities
+    @activities_by_date = @activities.group_by { |a| a[:start_time].to_date }
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
   end
 
   def index

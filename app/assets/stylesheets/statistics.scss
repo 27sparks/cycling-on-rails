@@ -1,0 +1,20 @@
+rect.bar {
+  fill: steelblue;
+  font: "Helvetica Neue", "Arial", sans-serif;
+  color: red;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
