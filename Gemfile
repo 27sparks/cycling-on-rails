@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'rails'#, github: 'rails/rails'
-gem 'sqlite3'
 
 gem 'bootstrap-sass'
 gem 'sass-rails', '~> 5.0'
@@ -32,6 +31,7 @@ group :production do
 end
 
 group :development, :test do
+  gem 'sqlite3'
   gem 'byebug'
   gem 'web-console', '~> 2.0'
   gem 'spring'
