@@ -25,14 +25,13 @@ class ActivitiesController < ApplicationController
   # POST /activities.json
   def create
     @activity = current_user.activities.build(activity_params)
-    tempfile = params[:activity][:tcx].instance_variable_get :@tempfile
-    @activity.save_with_all_properties tempfile.path
+    @activity.save_with_all_properties params[:TrainingCenterDatabase]
     respond_to do |format|
-      if @activity.save
-        format.html { redirect_to @current_user, notice: 'Activity was successfully created.' }
+      if @activity.save!
+        format.xml { render nil, status: :ok }
         format.json { render :show, status: :created, location: @activity }
       else
-        format.html { render :new }
+        format.xml { render xml: @activity.errors, status: :unprocessable_entity }
         format.json { render json: @activity.errors, status: :unprocessable_entity }
       end
     end
@@ -70,6 +69,6 @@ class ActivitiesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def activity_params
-      params.require(:activity).permit(:user_id, :tcx)
+      params.permit(:user_id, "TrainingCenterDatabase", :activity)
     end
 end

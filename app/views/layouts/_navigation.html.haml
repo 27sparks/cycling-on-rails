@@ -17,8 +17,10 @@
                 %span.glyphicon.glyphicon-list
               = link_to current_user, class: "btn" do
                 %span.glyphicon.glyphicon-user
-              = link_to new_activity_path, class: "btn" do
-                %span.glyphicon.glyphicon-upload
+              %a.btn.btn-file
+                %span.upload.glyphicon.glyphicon-upload
+                -#%input#fileChooser.btn{ type: "file" }
+                %input#fileChooser{ type: "file", multiple: "multiple" }
               = link_to logout_path, method: "delete", class: "btn" do
                 %span.glyphicon.glyphicon-log-out
 

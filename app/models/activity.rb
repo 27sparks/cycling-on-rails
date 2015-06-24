@@ -9,18 +9,6 @@ class Activity < ActiveRecord::Base
   scope :by_year, ->(year){ where(:start_time => Date.new(year, 1, 1).beginning_of_year..Date.new(year,1,1).end_of_year) }
   scope :by_year_and_month, ->(year, month){ where(:start_time => Date.new(year, month, 1).beginning_of_month..Date.new(year,month,1).end_of_month) }
 
-  def calculate_avg_heart_rate
-    count = 0
-    heart_rate_add_up = 0
-    self.laps.each do |lap|
-      lap.track.track_points.each do |tp|
-        count = count + 1
-        heart_rate_add_up += tp.heart_rate_bpm unless tp.heart_rate_bpm.nil?
-      end
-    end
-    count != 0 ? heart_rate_add_up / count : 0
-  end
-
   def avghr_bpm
     self.avg_heart_rate
   end
@@ -74,110 +62,58 @@ class Activity < ActiveRecord::Base
   end
 
   ### The following is all about parsing/importing the tcx/xml ###
-  def save_with_all_properties path
-    xml = File.read path
-    doc = Nokogiri::XML(xml)
-    parse_xml(doc)
-  end
-
-  def parse_xml doc
-    doc.root.elements.each do |node|
-      parse_author node if node.node_name == 'Author'
-      parse_activities node if node.node_name == 'Activities'
-    end
-  end
-
-  def parse_activities node
-    node.elements.each do |node|
-      parse_activity node if node.node_name.eql? 'Activity'
-    end
-  end
-
-  def parse_activity node
+  def save_with_all_properties data
+    @heart_rate_array = []
+    self.laps = []
     self.distance_m = 0
-    self.sport = node.attr('Sport') # Activity.sport
-    node.elements.each do |node|
-      self.activity_id = node.text.to_s if node.node_name.eql? 'Id' # Activity.activity_id
-      parse_lap node if node.node_name.eql? 'Lap'
-      parse_training node if node.node_name.eql? 'Training'
-      parse_creator node if node.node_name.eql? 'Creator'
+    self.sport = data['Activities']['Activity']['Sport']
+    self.activity_id = data['Activities']['Activity']['Id']
+    self[:start_time] ||= Date.parse(data['Activities']['Activity']['Id'])
+    if data['Activities']['Activity']['Lap'].class == Array
+      data['Activities']['Activity']['Lap'].each do |lap|
+        parse_lap lap
+      end
+    else
+      parse_lap data['Activities']['Activity']['Lap']
     end
-    self.avg_heart_rate = calculate_avg_heart_rate
+    self.avg_heart_rate = @heart_rate_array.sum / @heart_rate_array.count
     self.trimp = calculate_trimp
   end
 
-  def parse_lap node
+  def parse_lap lap
     tmp_lap = Lap.new
-    tmp_lap[:start_time] = node.attr('StartTime')
-    self.start_time ||= node.attr('StartTime')
-    node.elements.each do |node|
-      case node.node_name
-        when 'TotalTimeSeconds' then tmp_lap[:total_time_seconds] = node.text
-        when 'DistanceMeters' then tmp_lap[:distance_meters] = node.text
-        when 'Calories' then tmp_lap[:calories] = node.text
-        when 'Cadence' then tmp_lap[:cadence] = node.text
-        when 'AverageHeartRateBpm' then tmp_lap[:average_heart_rate_bpm] = node.text
-        when 'MaximumHeartRateBpm' then tmp_lap[:maximum_heart_rate_bpm] = node.text
-        when 'MaximumSpeed' then tmp_lap[:maximum_speed] = node.text
-        when 'Intensity' then tmp_lap[:intensity] = node.text
-        when 'TriggerMethod' then tmp_lap[:trigger_method] = node.text
-        when 'Track' then parse_track node, tmp_lap
-        when 'Extensions' then tmp_lap[:avg_speed] = 10#parse_extension_for_avg_speed node #Extension holds the avg_speed for a lap
-      end
-    end
+    tmp_lap[:start_time] = Date.parse(lap['StartTime'])
+    tmp_lap[:total_time_seconds] = lap['TotalTimeSeconds'].to_f
+    tmp_lap[:distance_meters] = lap['DistanceMeters']
+    tmp_lap[:calories] = lap['Calories']
+    tmp_lap[:cadence] = lap['Cadence']
+    tmp_lap[:average_heart_rate_bpm] = lap['AverageHeartRateBpm']
+    tmp_lap[:maximum_heart_rate_bpm] = lap['MaximumHeartRateBpm']
+    tmp_lap[:maximum_speed] = lap['MaximumSpeed']
+    tmp_lap[:intensity] = lap['Intensity']
+    tmp_lap[:trigger_method] = lap['TriggerMethod']
     self.distance_m += tmp_lap[:distance_meters]
-    self.laps << tmp_lap
-  end
-
-  def parse_training node
-
-  end
-
-  def parse_creator node
-
-  end
-
-  def parse_track node, tmp_lap
     tmp_track = Track.new
-    node.elements.each do |node|
-      parse_track_point node, tmp_track
+    lap['Track']['Trackpoint'].each do |trackpoint|
+      tmp_track_point = TrackPoint.new
+      tmp_track_point[:time] = trackpoint['Time']
+      tmp_track_point[:altitude_meters] = trackpoint['AltitudeMeters']
+      tmp_track_point[:distance_meters] = trackpoint['DistanceMeters']
+      tmp_track_point[:heart_rate_bpm] = trackpoint['HeartRateBpm'] ? trackpoint['HeartRateBpm']['Value'] : 0
+      @heart_rate_array << tmp_track_point[:heart_rate_bpm].to_i
+      tmp_track_point[:sensor_state] = trackpoint['SensorState']
+      if trackpoint[:Position].present?
+        tmp_position = Position.new
+        tmp_position[:latitude_degrees] = trackpoint['Position']['LatitudeDegrees']
+        tmp_position[:longitude_degrees] = trackpoint['Position']['LongitudeDegrees']
+        tmp_track_point.position = tmp_position
+      end
+      tmp_track.track_points << tmp_track_point
     end
     tmp_lap.track = tmp_track
-  end
-
-  def parse_extension_for_avg_speed node
-    node.elements
-    '10'
-  end
-
-  def parse_track_point node, tmp_track
-    tmp_track_point = TrackPoint.new
-    node.elements.each do |node|
-      case node.node_name
-        when 'Time' then tmp_track_point[:time] = node.text
-        when 'AltitudeMeters' then tmp_track_point[:altitude_meters] = node.text
-        when 'DistanceMeters' then tmp_track_point[:distance_meters] = node.text
-        when 'HeartRateBpm' then tmp_track_point[:heart_rate_bpm] = node.text
-        when 'SensorState' then tmp_track_point[:sensor_state] = node.text
-        when 'Position' then parse_position node, tmp_track_point
-      end
-    end
-    tmp_track.track_points << tmp_track_point
-  end
-
-  def parse_position node, tmp_track_point
-    tmp_position = Position.new
-    node.elements.each do |node|
-      case node.node_name
-        when 'LatitudeDegrees' then tmp_position[:latitude_degrees] = node.text
-        when 'LongitudeDegrees' then tmp_position[:longitude_degrees] = node.text
-      end
-    end
-    tmp_track_point.position = tmp_position
-  end
-
-  def parse_author node
-    #puts "AUTHOR"
-    #puts node
+    self.laps << tmp_lap
+    # parse_extension TODO
+    # parse_training ['Activities']['Activity']['Training'] TODO
+    # parse_creator ['Activities']['Activity']['Creator'] TODO
   end
 end
