@@ -3,6 +3,15 @@ module CalendarHelper
     Calendar.new(self, date, block).table
   end
 
+  def stars_by_trimp(trimp)
+    content_tag :div, class: 'stars' do
+      (1..(trimp/30).to_i).map do |i|
+        content_tag :span, class: 'glyphicon glyphicon-star' do
+          ''
+        end
+      end.join.html_safe
+    end
+  end
   class Calendar < Struct.new(:view, :date, :callback)
     HEADER = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday]
     START_DAY = :sunday

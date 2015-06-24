@@ -16,9 +16,9 @@
       .btn.btn-default#year year
 #activities
   %h2
-    = link_to "<", user_path(date: @date.prev_month)
+    .prev_month= link_to "<", user_path(date: @date.prev_month)
     = @date.strftime("%B %Y")
-    = link_to ">", user_path(date: @date.next_month)
+    .next_month= link_to ">", user_path(date: @date.next_month)
   = calendar @date do |date|
     = date.day
     - if @activities_by_date[date]
@@ -27,7 +27,7 @@
           %li
             = link_to activity do
               = "#{activity.sport} #{number_with_precision activity.distance_km, precision: 1} km"
-              = number_with_precision activity.trimp, precision: 1
+              = stars_by_trimp activity.trimp
             -#= link_to edit_activity_path(activity), class: 'btn' do
             -#  %span.glyphicon.glyphicon-edit
             -#= link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
