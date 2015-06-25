@@ -58,6 +58,21 @@ class StatisticsController < ApplicationController
               end
           end
         end
+      when 'avghr'
+        activities.each do |activity|
+          case
+            when params[:time_frame] == 'year' && params[:steps] == 'by_weeks'
+              @results[:data][activity.start_time.to_date.cweek - 1] += activity.send(function_call).to_f
+            when params[:time_frame] == 'year' && params[:steps] == 'by_days'
+              if activity.send(function_call).to_f > @results[:data][activity.start_time.to_date.yday - 1]
+                @results[:data][activity.start_time.to_date.yday - 1] = activity.send(function_call).to_f
+              end
+            when params[:time_frame] == 'month'
+              @results[:data][activity.start_time.to_date.day - 1] += activity.send(function_call).to_f
+            else
+              @results[:data][activity.start_time.month - 1] += activity.send(function_call).to_f
+          end
+        end
       else
         activities.each do |activity|
           case
@@ -74,11 +89,11 @@ class StatisticsController < ApplicationController
     end
     @results[:type] = case params[:unit]
                         when 'no_unit'
-                          'spline'
+                          'line'
                         when 'load'
                           'areaspline'
                         else
-                          'column'
+                          'spline'
                       end
     @results[:pointStart] = get_point_start params[:time_frame], params[:date]
     @results[:pointInterval] = get_point_interval params[:steps]
