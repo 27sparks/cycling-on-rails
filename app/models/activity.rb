@@ -68,7 +68,7 @@ class Activity < ActiveRecord::Base
     self.distance_m = 0
     self.sport = data['Activities']['Activity']['Sport']
     self.activity_id = data['Activities']['Activity']['Id']
-    self[:start_time] ||= Date.parse(data['Activities']['Activity']['Id'])
+    self[:start_time] ||= DateTime.parse(data['Activities']['Activity']['Id'])
     if data['Activities']['Activity']['Lap'].class == Array
       data['Activities']['Activity']['Lap'].each do |lap|
         parse_lap lap
@@ -82,7 +82,7 @@ class Activity < ActiveRecord::Base
 
   def parse_lap lap
     tmp_lap = Lap.new
-    tmp_lap[:start_time] = Date.parse(lap['StartTime'])
+    tmp_lap[:start_time] = DateTime.parse(lap['StartTime'])
     tmp_lap[:total_time_seconds] = lap['TotalTimeSeconds'].to_f
     tmp_lap[:distance_meters] = lap['DistanceMeters']
     tmp_lap[:calories] = lap['Calories']
