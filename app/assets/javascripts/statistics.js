@@ -1,12 +1,6 @@
 $(document).ready(function() {
     var time_frame = 'year'
     var date = ($.urlParam('date') == null ? new Date().toJSON().slice(0,10) : $.urlParam('date'))
-    var minDate = new Date();
-    minDate.setMonth(0);
-    minDate.setDate(1);
-    var maxDate = new Date();
-    maxDate.setMonth(11);
-    maxDate.setDate(31);
     var options = {
 
         chart: {
