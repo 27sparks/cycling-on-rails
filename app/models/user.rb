@@ -54,4 +54,8 @@ class User < ActiveRecord::Base
      else []
     end
   end
+
+  def admin?
+    false
+  end
 end
