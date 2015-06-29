@@ -1,10 +1,6 @@
-%header.navbar.navbar-fixed-top.navbar-blue
+%header.navbar.navbar-top.navbar-blue
   .navbar-inner
     .container
-      #logo
-        = link_to root_path, id: "Home" do
-          Cycling on Rails
-          %i.icon-plus
       %nav
         .nav.pull-right
           - if logged_in?
@@ -17,11 +13,20 @@
             -#      %li= link_to "Benutzer", users_path
             .btn-group
               -#-if can? :show, current_user
-              = link_to "Users", users_path, class: "btn"
-              = link_to "Profile", current_user, class: "btn"
-              = link_to "Logout",  logout_path, method: "delete", class: "btn"
+              = link_to users_path, class: "btn" do
+                %span.glyphicon.glyphicon-list
+              = link_to current_user, class: "btn" do
+                %span.glyphicon.glyphicon-user
+              %a.btn.btn-file
+                %span.upload.glyphicon.glyphicon-upload
+                -#%input#fileChooser.btn{ type: "file" }
+                %input#fileChooser{ type: "file", multiple: "multiple" }
+              = link_to logout_path, method: "delete", class: "btn" do
+                %span.glyphicon.glyphicon-log-out
 
           - else
             .btn-group
               = link_to "Register", register_path, class: "btn"
-              = link_to "Log In", login_path, class: "btn"
+              = link_to login_path, class: "btn" do
+                %span.glyphicon.glyphicon-log-in
+

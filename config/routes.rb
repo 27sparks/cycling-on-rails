@@ -1,14 +1,15 @@
 Rails.application.routes.draw do
   resources :activities
-  get 'sessions/new'
+  resources :users
 
+  get 'sessions/new'
+  get 'statistics/:values/:unit(/:time_frame(/:date(/:steps)))' => 'statistics#index', :defaults => { :format => 'json' }
   get 'register' => 'users#new'
   get 'about' => 'static_pages#about'
   get 'help' => 'static_pages#help'
   get    'login'   => 'sessions#new'
   post   'login'   => 'sessions#create'
   delete 'logout'  => 'sessions#destroy'
-  resources :users
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -64,5 +65,5 @@ Rails.application.routes.draw do
   #     resources :products
   #   end
 
-  root "static_pages#home"
+  root 'sessions#new'
 end

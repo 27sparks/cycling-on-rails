@@ -1,10 +1,10 @@
 class ActivitiesController < ApplicationController
   before_action :set_activity, only: [:show, :edit, :update, :destroy]
-
+  load_and_authorize_resource
   # GET /activities
   # GET /activities.json
   def index
-    @activities = Activity.all
+    @activities = current_user.activities.all
   end
 
   # GET /activities/1
@@ -25,14 +25,13 @@ class ActivitiesController < ApplicationController
   # POST /activities.json
   def create
     @activity = current_user.activities.build(activity_params)
-    tempfile = params[:activity][:tcx].instance_variable_get :@tempfile
-    @activity.save_with_all_properties tempfile.path
+    @activity.save_with_all_properties params[:TrainingCenterDatabase]
     respond_to do |format|
-      if @activity.save
-        format.html { redirect_to @activity, notice: 'Activity was successfully created.' }
+      if @activity.save!
+        format.xml { render nil, status: :ok }
         format.json { render :show, status: :created, location: @activity }
       else
-        format.html { render :new }
+        format.xml { render xml: @activity.errors, status: :unprocessable_entity }
         format.json { render json: @activity.errors, status: :unprocessable_entity }
       end
     end
@@ -57,7 +56,7 @@ class ActivitiesController < ApplicationController
   def destroy
     @activity.destroy
     respond_to do |format|
-      format.html { redirect_to activities_url, notice: 'Activity was successfully destroyed.' }
+      format.html { redirect_to current_user, notice: 'Activity was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -70,6 +69,6 @@ class ActivitiesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def activity_params
-      params.require(:activity).permit(:user_id, :tcx)
+      params.permit(:user_id, "TrainingCenterDatabase", :activity)
     end
 end

@@ -1,27 +1,39 @@
-%h1= @user.name
-%span= @user.email
-%br
-%b Total Distance:
-%span= @user.distance_total_km
+- this_month = Date.today.month
+- this_year = Date.today.year
 
-%table
-  %thead
-    %tr
-      %th Sport
-      %th Id
-      %th
-      %th
-      %th
-
-  %tbody
-    - @user.activities.each do |activity|
-      %tr
-        %td= activity.sport
-        %td= activity.activity_id
-        %td= link_to 'Show', activity
-        %td= link_to 'Edit', edit_activity_path(activity)
-        %td= link_to 'Destroy', activity, :method => :delete, :data => { :confirm => 'Are you sure?' }
-
-%br
-
-= link_to 'New Activity', new_activity_path
+.row
+  .col-sm-1
+    .btn-group-vertical
+      .btn#tlf TLF
+      .btn#add ADD
+      .btn#wtf WTF
+  .col-sm-10.chart-container
+    #dashboard-chart
+  .col-sm-1
+    .btn-group-vertical
+      .btn#standard_range standard
+      .btn#last_three_months last 3 months
+      .btn#this_month this month
+      .btn#last_month last month
+      .btn#this_year this year
+      .btn#last_year last year
+.row
+  .col-sm-12
+    #activities
+      %h2
+        .prev_month= link_to "<", user_path(date: @date.prev_month)
+        = @date.strftime("%B %Y")
+        .next_month= link_to ">", user_path(date: @date.next_month)
+      = calendar @date do |date|
+        = date.day
+        - if @activities_by_date[date]
+          %ul
+            - @activities_by_date[date].each do |activity|
+              %li
+                = link_to activity do
+                  = "#{activity.sport} #{number_with_precision activity.distance_km, precision: 1} km"
+                  = stars_by_trimp activity.trimp
+                  -#= link_to edit_activity_path(activity), class: 'btn' do
+                  -#  %span.glyphicon.glyphicon-edit
+                  -#= link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
+                  -#  %span.glyphicon.glyphicon-trash
