@@ -13,6 +13,9 @@
 
 ActiveRecord::Schema.define(version: 20150619170531) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "activities", force: :cascade do |t|
     t.integer  "user_id"
     t.string   "tcx"
@@ -26,7 +29,7 @@ ActiveRecord::Schema.define(version: 20150619170531) do
     t.integer  "distance_m"
   end
 
-  add_index "activities", ["user_id"], name: "index_activities_on_user_id"
+  add_index "activities", ["user_id"], name: "index_activities_on_user_id", using: :btree
 
   create_table "laps", force: :cascade do |t|
     t.integer  "activity_id"
@@ -46,7 +49,7 @@ ActiveRecord::Schema.define(version: 20150619170531) do
     t.datetime "start_time"
   end
 
-  add_index "laps", ["activity_id"], name: "index_laps_on_activity_id"
+  add_index "laps", ["activity_id"], name: "index_laps_on_activity_id", using: :btree
 
   create_table "positions", force: :cascade do |t|
     t.integer  "track_point_id"
@@ -56,7 +59,7 @@ ActiveRecord::Schema.define(version: 20150619170531) do
     t.datetime "updated_at",        null: false
   end
 
-  add_index "positions", ["track_point_id"], name: "index_positions_on_track_point_id"
+  add_index "positions", ["track_point_id"], name: "index_positions_on_track_point_id", using: :btree
 
   create_table "statistics", force: :cascade do |t|
     t.integer  "user_id"
@@ -64,7 +67,7 @@ ActiveRecord::Schema.define(version: 20150619170531) do
     t.datetime "updated_at", null: false
   end
 
-  add_index "statistics", ["user_id"], name: "index_statistics_on_user_id"
+  add_index "statistics", ["user_id"], name: "index_statistics_on_user_id", using: :btree
 
   create_table "track_points", force: :cascade do |t|
     t.integer  "track_id"
@@ -77,7 +80,7 @@ ActiveRecord::Schema.define(version: 20150619170531) do
     t.datetime "updated_at",      null: false
   end
 
-  add_index "track_points", ["track_id"], name: "index_track_points_on_track_id"
+  add_index "track_points", ["track_id"], name: "index_track_points_on_track_id", using: :btree
 
   create_table "tracks", force: :cascade do |t|
     t.integer  "lap_id"
@@ -85,7 +88,7 @@ ActiveRecord::Schema.define(version: 20150619170531) do
     t.datetime "updated_at", null: false
   end
 
-  add_index "tracks", ["lap_id"], name: "index_tracks_on_lap_id"
+  add_index "tracks", ["lap_id"], name: "index_tracks_on_lap_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
@@ -95,4 +98,10 @@ ActiveRecord::Schema.define(version: 20150619170531) do
     t.string   "password_digest"
   end
 
+  add_foreign_key "activities", "users"
+  add_foreign_key "laps", "activities"
+  add_foreign_key "positions", "track_points"
+  add_foreign_key "statistics", "users"
+  add_foreign_key "track_points", "tracks"
+  add_foreign_key "tracks", "laps"
 end
