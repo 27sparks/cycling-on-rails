@@ -62,7 +62,7 @@ class StatisticsController < ApplicationController
     @results[:type] = case params[:unit]
                         when 'no_unit'
                           'line'
-                        when 'imp', 'bpm'
+                        when 'imp', 'bpm', 'km', 'h'
                           'bar'
                         when 'load'
                           'areaspline'
