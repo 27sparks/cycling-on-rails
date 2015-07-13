@@ -1,12 +1,12 @@
 GIT
   remote: git://github.com/rails/arel.git
-  revision: 4767bb11c280f97262d221c47af8d39ab4fd583f
+  revision: 14df08d80fc363fb9932d9534503b3276d30d9a5
   specs:
     arel (7.0.0.alpha)
 
 GIT
   remote: git://github.com/rails/rails.git
-  revision: eb10496a1c3d9fe58b91aa0ec17d9f218738d5dc
+  revision: 08e41a043218583d34e34316df82d38e4d7f1b55
   specs:
     actionmailer (5.0.0.alpha)
       actionpack (= 5.0.0.alpha)
@@ -66,15 +66,9 @@ GEM
   specs:
     actionpack-xml_parser (1.0.2)
       actionpack (>= 4.0.0, < 5)
-    autoprefixer-rails (5.2.1)
-      execjs
-      json
     bcrypt (3.1.10)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
-    bootstrap-sass (3.3.5)
-      autoprefixer-rails (>= 5.0.0.1)
-      sass (>= 3.2.19)
     builder (3.2.2)
     byebug (5.0.0)
       columnize (= 0.9.0)
@@ -187,7 +181,6 @@ DEPENDENCIES
   actionpack-xml_parser
   arel!
   bcrypt (~> 3.1.7)
-  bootstrap-sass
   byebug
   cancancan
   coffee-rails (~> 4.1.0)
