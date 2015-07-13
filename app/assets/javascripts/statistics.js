@@ -1,8 +1,9 @@
 $(document).ready(function() {
     var time_frame = 'year'
     var date = ($.urlParam('date') == null ? new Date().toJSON().slice(0,10) : $.urlParam('date'))
-    var options = {
-
+    var userStatistics
+    var options
+    var options_overview = {
         chart: {
             renderTo: 'dashboard-chart',
             zoomType: 'x'
@@ -20,9 +21,9 @@ $(document).ready(function() {
                 }
         ],
         xAxis: {
-            type: 'datetime',
-            min: new Date().setMonth(new Date().getMonth() - 3),
-            max: new Date().setMonth(new Date().getMonth() + 1)
+            type: 'datetime'
+            //min: new Date().setMonth(new Date().getMonth() - 3),
+            //max: new Date().setMonth(new Date().getMonth() + 1)
         },
         credits: { enabled: false },
         plotOptions: {
@@ -31,42 +32,74 @@ $(document).ready(function() {
             }
         }
     };
+    var options_activity = {
+            chart: {
+                renderTo: 'dashboard-chart',
+                zoomType: 'x'
+            },
+            title: { text: 'Activity' },
+            yAxis: [{ title: { text: '' },
+                        min: 0
+                    },
+                    { title: { text: '' },
+                        min: 0
+                    },
+                    { title: { text: '' },
+                        min: 0,
+                        opposite: true
+                    }
+            ],
+            xAxis: {
+                type: 'linear'
+            },
+            credits: { enabled: false },
+            plotOptions: {
+                spline: {
+                    connectNulls: true,
+                    connectEnds: true
+                }
+            }
+        };
 
-    function get_and_show_graph_from_json(url, index, array) {
-        $.getJSON(url, function (data) {
-            data.yAxis = index;
-            chart.addSeries(data);
-            if (data.unit == 'no_unit'){ data.unit = data.name }
-            chart.yAxis[index].setTitle({text: data.unit})
+
+
+    function set_up_graph(graphData, i) {
+        graphData.yAxis = i;
+        chart.yAxis[i].setTitle({ text: graphData.unit });
+        chart.addSeries(graphData);
+    }
+    function set_up_chart(seriesArray) {
+        chart = new Highcharts.Chart(options);
+        seriesArray.forEach(function(graphData, i){
+            set_up_graph(graphData, i)
         });
     }
-    function collect_jsons(urls) {
-        chart = new Highcharts.Chart(options);
-        urls.forEach(get_and_show_graph_from_json)
-    }
-    function show_tlf()
-    {
-        var url = "/statistics/fatigue/no_unit/" + time_frame + "/" + date + "/by_days";
-        var url2 = "/statistics/load/load/" + time_frame + "/" + date + "/by_days";
-        var url3 = "/statistics/trimp/imp/" + time_frame + "/" + date + "/by_days";
-        collect_jsons([url, url2, url3]);
+
+    function show_tlf() {
+        options = options_overview;
+        seriesArray = [userStatistics.trimp, userStatistics.load, userStatistics.fatique]
+        set_up_chart(seriesArray)
     };
 
     function show_add() {
-        var url = "/statistics/distance/km/" + time_frame + "/" + date + "/by_days";
-        var url2 = "/statistics/duration/h/" + time_frame + "/" + date + "/by_days";
-        var url3 ="/statistics/avghr/bpm/" + time_frame + "/" + date + "/by_days";
-        collect_jsons([url, url2, url3])
+        options = options_overview
+        seriesArray = [userStatistics.avghr, userStatistics.distance, userStatistics.duration]
+        set_up_chart(seriesArray)
     };
 
-    function set_time_frame(tf) {
-        time_frame = tf;
-        show_tlf();
-    };
+    function get_user_statistics() {
+        var url = "/statistics/user/2015"
+        $.getJSON(url, function(data){
+            userStatistics = data;
+            show_tlf();
+        });
+    }
 
-    show_tlf()
+    get_user_statistics();
+
     $('#tlf').click(function(){show_tlf()});
     $('#add').click(function(){show_add()});
+
     $('#standard_range').click(function(){
         var min = new Date().setMonth(new Date().getMonth() - 3);
         var max = new Date().setMonth(new Date().getMonth() + 1)
@@ -104,4 +137,25 @@ $(document).ready(function() {
         chart.xAxis[0].setExtremes(x,Date.now());
     });
 
+    function show_activity(data) {
+        seriesArray = [data.hrbpm, data.alt, data.speed];
+        options = options_activity;
+        options.title.text = "Activity " + data.start_time;
+        var min = new Date(data.start_time)
+        var max = new Date(data.end_time)
+        set_up_chart(seriesArray)
+        //chart.xAxis[0].setExtremes(0,200);
+    }
+
+    function get_activity(id){
+        var url = "/statistics/activity/" + id;
+        $.getJSON(url, function(data){
+            show_activity(data);
+        });
+    }
+
+    $('.activity').click(function(e){
+        e.preventDefault();
+        get_activity($(this).data('id'));
+    })
 });

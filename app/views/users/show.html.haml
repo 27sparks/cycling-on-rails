@@ -30,10 +30,10 @@
           %ul
             - @activities_by_date[date].each do |activity|
               %li
-                = link_to activity do
+                = link_to activity, class: "activity activity-#{activity.id}", :data => { :id => "#{activity.id}"} do
                   = "#{activity.sport} #{number_with_precision activity.distance_km, precision: 1} km"
                   = stars_by_trimp activity.trimp
                   -#= link_to edit_activity_path(activity), class: 'btn' do
                   -#  %span.glyphicon.glyphicon-edit
-                  -#= link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
-                  -#  %span.glyphicon.glyphicon-trash
+                = link_to activity, class: 'btn', :method => :delete, :data => { :confirm => 'Are you sure?' } do
+                  %span.glyphicon.glyphicon-trash

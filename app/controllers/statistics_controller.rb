@@ -1,156 +1,98 @@
 class StatisticsController < ApplicationController
   include StatisticsHelper
-  before_action :set_statistic, only: [:show, :edit, :update, :destroy]
+
+  LOAD_PERCENTAGE_ARRAY = [1,5,10,15,30,40,43,45,47,49,50,49,48,46,44,42,40,37,35,34,32,31,29,28,24,20,17,14,12,10,9,8,7,6,5,4,3,2,1]
+  FATIQUE_PERCENTAGE_ARRAY = [100,80,50,40,30,20,10,5,3,2,1]
 
   def index
-    function_call = get_function_call params[:values], params[:unit]
-    interval = prepare_interval params[:time_frame], params[:date], params[:values]
-    activities = current_user.activities.where("start_time >= ? and start_time <= ?", interval[:start], interval[:end])
-    @results = get_prepared_object_for params[:time_frame], params[:date], params[:steps]
+    activities = current_user.activities.all
+    @results = get_prepared_object params[:year]
+    activities.each do |activity|
+      day = activity.start_time.to_date.yday
+      # add fatigue to the results
+      FATIQUE_PERCENTAGE_ARRAY.each_with_index do |percent, i|
+        if @results[:fatique][:data][day + i].nil? == false
+          @results[:fatique][:data][day + i] += (activity.trimp / 100 * percent).to_f
+        end
+      end
+      #add load to the results
+      LOAD_PERCENTAGE_ARRAY.each_with_index do |percent, i|
+        if @results[:load][:data][day + i].nil? == false
+          @results[:load][:data][day + i] += (activity.trimp / 100 * percent).to_f
+        end
+      end
+      #add average heartrate to the results
+      @results[:avghr][:data][day] = activity.avghr_bpm.to_f
+      @results[:trimp][:data][day] = activity.trimp.to_f
+      @results[:distance][:data][day] = activity.distance_m.to_f
+      @results[:duration][:data][day] = activity.duration_h.to_f
 
-    case params[:values]
-      when 'fatigue'
-        activities.each do |activity|
-          case params[:time_frame]
-            when 'month'
-              (1..100).each do |i|
-                if @results[:data][activity.start_time.to_date.day + i - 1].nil? == false
-                  @results[:data][activity.start_time.to_date.day + i - 1] += ((activity.trimp / 50 / i) * 30.0).to_f
-                end
-              end
-            else
-              (1..100).each do |i|
-                if @results[:data][activity.start_time.to_date.yday + i- 1].nil? == false
-                  @results[:data][activity.start_time.to_date.yday + i - 1] += ((activity.trimp / 50 / i) * 20.0).to_f
-                end
-              end
-          end
-
-        end
-      when 'load'
-        activities.each do |activity|
-          case params[:time_frame]
-            when 'month'
-              (1..6).each do |i|
-                @results[:data][activity.start_time.to_date.day + i] += i if @results[:data][activity.start_time.to_date.day + i].present?
-              end
-              (7..100).each do |i|
-                @results[:data][activity.start_time.to_date.day + i] += 6.0 if @results[:data][activity.start_time.to_date.day + i].present?
-              end
-              (2..6).each do |i|
-                @results[:data][activity.start_time.to_date.day + i] -= ((activity.trimp / 200 / i) * 10.0).to_f if @results[:data][activity.start_time.to_date.day + i].present?
-              end
-              (7..100).each do |i|
-                @results[:data][activity.start_time.to_date.day + i] -= (i.to_f / 16) if @results[:data][activity.start_time.to_date.day + i].present?
-              end
-            else
-              (1..6).each do |i|
-                @results[:data][activity.start_time.to_date.yday + i] += i if @results[:data][activity.start_time.to_date.yday + i].present?
-              end
-              (7..100).each do |i|
-                @results[:data][activity.start_time.to_date.yday + i] += 6.0 if @results[:data][activity.start_time.to_date.yday + i].present?
-              end
-              (2..6).each do |i|
-                @results[:data][activity.start_time.to_date.yday + i] -= ((activity.trimp / 200 / i) * 10.0).to_f if @results[:data][activity.start_time.to_date.yday + i].present?
-              end
-              (7..100).each do |i|
-                @results[:data][activity.start_time.to_date.yday + i] -= (i.to_f / 16) if @results[:data][activity.start_time.to_date.yday + i].present?
-              end
-          end
-        end
-      when 'avghr'
-        activities.each do |activity|
-          case
-            when params[:time_frame] == 'year' && params[:steps] == 'by_weeks'
-              @results[:data][activity.start_time.to_date.cweek - 1] += activity.send(function_call).to_f
-            when params[:time_frame] == 'year' && params[:steps] == 'by_days'
-              if activity.send(function_call).to_f > @results[:data][activity.start_time.to_date.yday - 1]
-                @results[:data][activity.start_time.to_date.yday - 1] = activity.send(function_call).to_f
-              end
-            when params[:time_frame] == 'month'
-              @results[:data][activity.start_time.to_date.day - 1] += activity.send(function_call).to_f
-            else
-              @results[:data][activity.start_time.month - 1] += activity.send(function_call).to_f
-          end
-        end
-      else
-        activities.each do |activity|
-          case
-            when params[:time_frame] == 'year' && params[:steps] == 'by_weeks'
-              @results[:data][activity.start_time.to_date.cweek - 1] += activity.send(function_call).to_f
-            when params[:time_frame] == 'year' && params[:steps] == 'by_days'
-              @results[:data][activity.start_time.to_date.yday - 1] += activity.send(function_call).to_f
-            when params[:time_frame] == 'month'
-              @results[:data][activity.start_time.to_date.day - 1] += activity.send(function_call).to_f
-            else
-              @results[:data][activity.start_time.month - 1] += activity.send(function_call).to_f
-          end
-        end
     end
-    @results[:type] = case params[:unit]
-                        when 'no_unit'
-                          'line'
-                        when 'load'
-                          'areaspline'
-                        else
-                          'spline'
-                      end
-    @results[:pointStart] = get_point_start params[:time_frame], params[:date]
-    @results[:pointInterval] = get_point_interval params[:steps]
+    @results[:avghr][:unit] = 'bpm'
+    @results[:avghr][:type] = 'bar'
+    @results[:avghr][:name] = 'bpm'
+    @results[:trimp][:unit] = 'imp'
+    @results[:trimp][:type] = 'bar'
+    @results[:trimp][:name] = 'trimp'
+    @results[:distance][:unit] = 'm'
+    @results[:distance][:type] = 'bar'
+    @results[:distance][:name] = 'distance'
+    @results[:duration][:unit] = 'h'
+    @results[:duration][:type] = 'bar'
+    @results[:duration][:name] = 'duration'
+    @results[:fatique][:unit] = 'fatique'
+    @results[:fatique][:type] = 'line'
+    @results[:fatique][:name] = 'fatique'
+    @results[:load][:unit] = 'load'
+    @results[:load][:type] = 'areaspline'
+    @results[:load][:name] = 'load'
+    @results.each do |key, result|
+      @results[key][:pointStart] = get_point_start('year', '1-1-2015')
+      @results[key][:pointInterval] = get_point_interval('by_days')
+    end
   end
 
   # GET /statistics/1
   # GET /statistics/1.json
   def show
-  end
+    activity = Activity.find(params[:id])
+    last_distance = 0
+    @result = {}
 
-  # GET /statistics/new
-  def new
-    @statistic = Statistic.new
-  end
+    @result[:hrbpm] = {}
+    @result[:hrbpm][:unit] = 'bpm'
+    @result[:hrbpm][:name] = 'heartrate'
+    @result[:hrbpm][:type] = 'spline'
 
-  # GET /statistics/1/edit
-  def edit
-  end
+    @result[:alt] = {}
+    @result[:alt][:type] = 'areaspline'
+    @result[:alt][:unit] = 'm'
+    @result[:alt][:name] = 'height'
 
-  # POST /statistics
-  # POST /statistics.json
-  def create
-    @statistic = Statistic.new(statistic_params)
+    @result[:speed] = {}
+    @result[:speed][:unit] = 'km/h'
+    @result[:speed][:name] = 'speed'
+    @result[:speed][:type] = 'spline'
 
-    respond_to do |format|
-      if @statistic.save
-        format.html { redirect_to @statistic, notice: 'Statistic was successfully created.' }
-        format.json { render :show, status: :created, location: @statistic }
-      else
-        format.html { render :new }
-        format.json { render json: @statistic.errors, status: :unprocessable_entity }
+    @result.each do |key, value|
+      @result[key][:data] = []
+      @result[key][:pointStart] = activity.start_time.to_datetime.strftime('%Q').to_i
+      @result[key][:pointInterval] = 1000
+    end
+    activity.laps.order(:start_time).each do |lap|
+      lap.track.track_points.order(:time).each do |point|
+        @result[:hrbpm][:data] << [ point.distance_meters.to_f,point.heart_rate_bpm.to_i]
+        @result[:alt][:data] << [ point.distance_meters.to_f,point.altitude_meters.to_f]
+        if point.distance_meters.present?
+          speed = (point.distance_meters - last_distance) * 3.6
+        end
+        @result[:speed][:data] << [point.distance_meters.to_f, speed.to_f]
+        last_distance =  point.distance_meters.to_f
       end
     end
-  end
-
-  # PATCH/PUT /statistics/1
-  # PATCH/PUT /statistics/1.json
-  def update
-    respond_to do |format|
-      if @statistic.update(statistic_params)
-        format.html { redirect_to @statistic, notice: 'Statistic was successfully updated.' }
-        format.json { render :show, status: :ok, location: @statistic }
-      else
-        format.html { render :edit }
-        format.json { render json: @statistic.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /statistics/1
-  # DELETE /statistics/1.json
-  def destroy
-    @statistic.destroy
-    respond_to do |format|
-      format.html { redirect_to statistics_url, notice: 'Statistic was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    @result[:start_time] = activity.start_time.to_datetime
+    @result[:end_time] = activity.start_time.to_datetime + activity.duration_s.seconds
+    @result
   end
 
   private

@@ -8,9 +8,10 @@ class Ability
     if user.admin?
       #can :manage, :all
     else
-      can :show, Activity, :user_id => user.id
+      can :manage, Activity, :user_id => user.id
       can :show, User, :id => user.id
       can :read, Statistic, :id => user.id
+      can :create, User
       #can :show, User, :id => user.id
     end
 
