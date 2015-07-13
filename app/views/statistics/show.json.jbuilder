@@ -1,1 +1,2 @@
-json.extract! @, :id, :user_id, :created_at, :updated_at
+json.extract!(@result, :hrbpm, :alt, :speed, :start_time, :end_time)
+json.kind('activity')

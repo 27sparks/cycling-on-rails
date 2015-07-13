@@ -1,4 +1,4 @@
-json.extract!(@results, :data, :pointStart, :pointInterval, :type)
-json.unit params[:unit]
+json.extract!(@results, :avghr, :load, :trimp, :fatique, :duration, :distance)
 json.name params[:values]
+
 

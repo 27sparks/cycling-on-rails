@@ -24,6 +24,7 @@ module StatisticsHelper
   def get_date_from_anything date
     if date.present?
       case
+        when date.class == 'Fixnum' then Date.new(date, 1, 1)
         when date.include?('-') then DateTime.parse(date)
         when date.length == 2 then Date.new(('20' + date).to_i)
         else Date.new(date.to_i)
@@ -61,6 +62,18 @@ module StatisticsHelper
                       year_by_months_array
                   end
     { data: data_array }
+  end
+
+  def get_prepared_object year
+    {
+        fatique: { data: year_by_days_array(year) },
+        load: { data: year_by_days_array(year) },
+        trimp: { data: year_by_days_array(year) },
+        avghr: { data: year_by_days_array(year) },
+        duration: { data: year_by_days_array(year) },
+        distance: { data: year_by_days_array(year) }
+
+    }
   end
 
   def year_by_months_array

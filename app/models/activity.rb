@@ -95,6 +95,7 @@ class Activity < ActiveRecord::Base
     self.distance_m += tmp_lap[:distance_meters]
     tmp_track = Track.new
     lap['Track']['Trackpoint'].each do |trackpoint|
+      puts trackpoint['DistanceMeters']
       tmp_track_point = TrackPoint.new
       tmp_track_point[:time] = trackpoint['Time']
       tmp_track_point[:altitude_meters] = trackpoint['AltitudeMeters']
