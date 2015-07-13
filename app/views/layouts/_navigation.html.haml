@@ -1,32 +1,75 @@
-%header.navbar.navbar-top.navbar-blue
-  .navbar-inner
-    .container
-      %nav
-        .nav.pull-right
-          - if logged_in?
-            -#- if current_user.role == 'admin'
-            -#  .btn-group
-            -#    %a.btn.btn-inverse.dropdown-toggle{ data: {toggle: "dropdown"}, href: '#'}
-            -#      Admin
-            -#      %span.caret
-            -#    %ul.dropdown-menu
-            -#      %li= link_to "Benutzer", users_path
-            .btn-group
-              -#-if can? :show, current_user
-              = link_to users_path, class: "btn" do
-                %span.glyphicon.glyphicon-list
-              = link_to current_user, class: "btn" do
-                %span.glyphicon.glyphicon-user
-              %a.btn.btn-file
-                %span.upload.glyphicon.glyphicon-upload
-                -#%input#fileChooser.btn{ type: "file" }
-                %input#fileChooser{ type: "file", multiple: "multiple" }
-              = link_to logout_path, method: "delete", class: "btn" do
-                %span.glyphicon.glyphicon-log-out
+-#%header.navbar.navbar-top.navbar-blue
+-#  .navbar-inner
+-#    .container
+-#      %nav
+-#        .nav.pull-right
+-#          - if logged_in?
+-#            -#- if current_user.role == 'admin'
+-#            -#  .btn-group
+-#            -#    %a.btn.btn-inverse.dropdown-toggle{ data: {toggle: "dropdown"}, href: '#'}
+-#            -#      Admin
+-#            -#      %span.caret
+-#            -#    %ul.dropdown-menu
+-#            -#      %li= link_to "Benutzer", users_path
+-#            .btn-group
+-#              -#-if can? :show, current_user
+-#              = link_to users_path, class: "btn" do
+-#                %span.glyphicon.glyphicon-list
+-#              = link_to current_user, class: "btn" do
+-#                %span.glyphicon.glyphicon-user
+-#              %a.btn.btn-file
+-#                %span.upload.glyphicon.glyphicon-upload
+-#                -#%input#fileChooser.btn{ type: "file" }
+-#                %input#fileChooser{ type: "file", multiple: "multiple" }
+-#              = link_to logout_path, method: "delete", class: "btn" do
+-#                %span.glyphicon.glyphicon-log-out
+-#
+-#          - else
+-#            .btn-group
+-#              = link_to "Register", register_path, class: "btn"
+-#              = link_to login_path, class: "btn" do
+-#                %span.glyphicon.glyphicon-log-in
+.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+  %header.mdl-layout__header
+    .mdl-layout__header-row
+      %span.mdl-layout-title Cycling
+      .mdl-layout-spacer
+      %nav.mdl-navigation.mdl-layout--large-screen-only
+        - if logged_in?
+          -#- if current_user.role == 'admin'
+          -#  .btn-group
+          -#    %a.btn.btn-inverse.dropdown-toggle{ data: {toggle: "dropdown"}, href: '#'}
+          -#      Admin
+          -#      %span.caret
+          -#    %ul.dropdown-menu
+          -#      %li= link_to "Benutzer", users_path
+          -#-if can? :show, current_user
+          = link_to users_path, class: "btn" do
+            %span.glyphicon.glyphicon-list
+          = link_to current_user, class: "btn" do
+            %span.glyphicon.glyphicon-user
+          %a.btn.btn-file
+            %span.upload.glyphicon.glyphicon-upload
+            -#%input#fileChooser.btn{ type: "file" }
+            %input#fileChooser{ type: "file", multiple: "multiple" }
+          = link_to logout_path, method: "delete", class: "btn" do
+            %span.glyphicon.glyphicon-log-out
 
-          - else
-            .btn-group
-              = link_to "Register", register_path, class: "btn"
-              = link_to login_path, class: "btn" do
-                %span.glyphicon.glyphicon-log-in
+        - else
+          = link_to "Register", register_path, class: "btn"
+          = link_to login_path, class: "btn" do
+            %span.glyphicon.glyphicon-log-in
 
+-#  <div class="mdl-layout__drawer">
+-#    <span class="mdl-layout-title">Title</span>
+-#    <nav class="mdl-navigation">
+-#      <a class="mdl-navigation__link" href="">Link</a>
+-#      <a class="mdl-navigation__link" href="">Link</a>
+-#      <a class="mdl-navigation__link" href="">Link</a>
+-#      <a class="mdl-navigation__link" href="">Link</a>
+-#    </nav>
+-#  </div>
+-#  <main class="mdl-layout__content">
+-#    <div class="page-content"><!-- Your content goes here --></div>
+-#  </main>
+-#</div>
