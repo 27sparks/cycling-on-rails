@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= requite material
 //= require highcharts
 //= require_tree .
 
